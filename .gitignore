@@ -1,0 +1,8 @@
+*.meta
+*.csproj
+*.sln
+Cooking Master/.vs
+Cooking Master/Library
+Cooking Master/Logs
+Cooking Master/obj
+Cooking Master/Temp
