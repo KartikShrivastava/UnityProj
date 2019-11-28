@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour {
 
     void Start() {
         timeBarMaxSz = timeBarObject[0].transform.GetChild(0).localScale.y;
-        InvokeRepeating("UpdateTime", 1.0f, 1.0f);
+        InvokeRepeating("UpdateTime", 1.0f, 0.5f);
     }
 
     public void InitializePlayers(int numRows, int numColumns, Material[] mat) {         
@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviour {
 
     void UpdateTime() {
         foreach(Player player in players) {
-            player.timeRemaining -= 1.1f;
+            player.timeRemaining -= 0.1f;
             if(player.timeRemaining < 0.0f) {
                 CancelInvoke();
                 player.timeBar.SetActive(false);

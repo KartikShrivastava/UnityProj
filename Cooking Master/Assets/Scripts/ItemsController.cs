@@ -6,12 +6,4 @@ public class ItemsController : MonoBehaviour
 {
     public ItemType type;
     public FruitName fruit;
-
-    void Start() {
-        
-    }
-
-    void Update() {
-        
-    }
 }

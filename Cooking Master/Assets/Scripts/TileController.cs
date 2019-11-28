@@ -1,12 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TileController : MonoBehaviour {
 
     public Material[] mat;
     public PlayerController playerController;
+    public CustomerController customerController;
     public GameObject[] fruits;
+    public Text[] scoreText;
 
     private List<List<Tile>> tiles;
     private int numRows, numColumns;
@@ -86,7 +89,9 @@ public class TileController : MonoBehaviour {
     void Move(int p, int row, int rowDelta, int col, int colDelta) {
         if ((row+rowDelta >= 0 && row+rowDelta < numRows) && (col+colDelta>=0 && col+colDelta < numColumns) 
             && !tiles[row+rowDelta][col+colDelta].isOccupied 
-            && tiles[row+rowDelta][col+colDelta].go.CompareTag("Movable"))
+            && tiles[row+rowDelta][col+colDelta].go.CompareTag("Movable")
+            && !(p == 0 && (row + rowDelta == 0) && (col + colDelta == 5 || col + colDelta == 6))
+            && !(p == 1 && (row + rowDelta == 0) && (col + colDelta == 2 || col + colDelta == 3)))
         {
 
             tiles[row][col].go.GetComponent<MeshRenderer>().material = mat[mat.Length-1];
@@ -114,39 +119,117 @@ public class TileController : MonoBehaviour {
             switch (obj.type)
             {
                 case ItemType.Fruit:
-                    GameObject go = null;
-                    if (playerController.players[p].items.Count < 4)
-                         go = Instantiate(fruits[(int)obj.fruit]);
-                    switch (obj.fruit)
+
+                    if (playerController.players[p].items.Count < 2 && playerController.players[p].salad.Count <= 0)
                     {
-                        case FruitName.Apple:
-                            playerController.players[p].AddItem(obj.type, obj.fruit, go);
-                            break;
-                        case FruitName.Banana:
-                            playerController.players[p].AddItem(obj.type, obj.fruit, go);
-                            break;
-                        case FruitName.Watermelon:
-                            playerController.players[p].AddItem(obj.type, obj.fruit, go);
-                            break;
-                        case FruitName.Cherry:
-                            playerController.players[p].AddItem(obj.type, obj.fruit, go);
-                            break;
-                        case FruitName.Avocaado:
-                            playerController.players[p].AddItem(obj.type, obj.fruit, go);
-                            break;
-                        case FruitName.Strawberry:
-                            playerController.players[p].AddItem(obj.type, obj.fruit, go);
-                            break;
+                        GameObject go = Instantiate(fruits[(int)obj.fruit]);
+                        switch (obj.fruit)
+                        {
+                            case FruitName.Apple:
+                                playerController.players[p].AddItem(obj.type, obj.fruit, go);
+                                break;
+                            case FruitName.Banana:
+                                playerController.players[p].AddItem(obj.type, obj.fruit, go);
+                                break;
+                            case FruitName.Watermelon:
+                                playerController.players[p].AddItem(obj.type, obj.fruit, go);
+                                break;
+                            case FruitName.Cherry:
+                                playerController.players[p].AddItem(obj.type, obj.fruit, go);
+                                break;
+                            case FruitName.Avocaado:
+                                playerController.players[p].AddItem(obj.type, obj.fruit, go);
+                                break;
+                            case FruitName.Strawberry:
+                                playerController.players[p].AddItem(obj.type, obj.fruit, go);
+                                break;
+                        }
+                        go = null;
                     }
                     break;
                 case ItemType.Process:
                     if (playerController.players[p].items.Count > 0)
                     {
-                        Destroy(playerController.players[p].items.Peek().go);
-                        playerController.players[p].RemoveItem();
+                        ProcessFruitController processFruitController = tiles[row][col].go.GetComponent<ProcessFruitController>();
+                        if (processFruitController && !processFruitController.isProcesssing)
+                        {
+                            processFruitController.StartProcessing(playerController.players[p].items.Peek().go);
+                            playerController.players[p].RemoveItem();
+                        }
+                    }
+                    break;
+                case ItemType.PickOrder:
+                    PickOrderController pickOrderController = tiles[row][col].go.GetComponent<PickOrderController>();
+
+                    if (pickOrderController && pickOrderController.processedFruit.Count>0 && playerController.players[p].items.Count <= 0)
+                    {
+                        playerController.players[p].AddSalad(pickOrderController.processedFruit);
+                        pickOrderController.Clear();
+                    }
+                    break;
+                case ItemType.Trash:
+                    Trash(p);
+                    break;
+                case ItemType.Serve:
+                    ServiceController serviceController = tiles[row][col].go.GetComponent<ServiceController>();
+                    Debug.Log(CustomerController.isCustomerPresent[col - 1]);
+                    if(serviceController && CustomerController.isCustomerPresent[col - 1] != -1)
+                    {
+                        CustomerSatisfaction customerSatisfaction = serviceController.CheckCombination(
+                            customerController.customerList[CustomerController.isCustomerPresent[col-1]],
+                            playerController.players[p].salad, p);
+
+                        switch (customerSatisfaction)
+                        {
+                            case CustomerSatisfaction.angry:
+                                playerController.players[p].score -= 5;
+                                break;
+                            case CustomerSatisfaction.veryAngry:
+                                playerController.players[p].score -= 10;
+                                break;
+                            case CustomerSatisfaction.happy:
+                                playerController.players[p].score += 20;
+                                float val = playerController.players[p].timeRemaining;
+                                if(val+2.0f > playerController.timerMaxVal)
+                                {
+                                    val = playerController.timerMaxVal;
+                                }
+                                else
+                                {
+                                    val = val + 2.0f;
+                                }
+                                playerController.players[p].timeRemaining = val;
+                                Destroy(customerController.customerList[CustomerController.isCustomerPresent[col-1]].go);
+                                customerController.RemoveCustomer(CustomerController.isCustomerPresent[col - 1]);
+                                CustomerController.isCustomerPresent[col - 1] = -1;
+                                Trash(p);
+                                break;
+                            case CustomerSatisfaction.veryHappy:
+                                //TODO: Implement power ups
+                                break;
+                        }
+                        Debug.Log("Present");
+
+                        UpdateScores(p, playerController.players[p].score);
+                    }
+                    else
+                    {
+                        Debug.Log("Absent");
                     }
                     break;
             }
         }
+    }
+
+    void UpdateScores(int player, int score)
+    {
+        scoreText[player].text = "" + score;
+    }
+
+    void Trash(int p)
+    {
+        foreach (Transform child in playerController.players[p].tray.transform)
+            Destroy(child.gameObject);
+        playerController.players[p].Clear();
     }
 }
