@@ -10,4 +10,6 @@ public class Tile {
         isOccupied = false;
         occupyingPlayer = -1;
     }
+
+
 }
