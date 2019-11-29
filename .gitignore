@@ -1,4 +1,4 @@
-*.meta
+#*.meta
 *.csproj
 *.sln
 Cooking Master/.vs
