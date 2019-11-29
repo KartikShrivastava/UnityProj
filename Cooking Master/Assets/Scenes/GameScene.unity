@@ -4829,7 +4829,7 @@ MonoBehaviour:
   - {fileID: 8993685459688032977, guid: f3b98ed578d822149bf88544f7c4758e, type: 3}
   scoreText:
   - {fileID: 584215216}
-  - {fileID: 0}
+  - {fileID: 148847679}
   userGuide:
   - {fileID: 503446758}
   - {fileID: 1118442649}

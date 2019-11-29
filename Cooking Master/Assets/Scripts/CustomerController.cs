@@ -62,13 +62,36 @@ public class CustomerController : MonoBehaviour
 
     }
 
-    public void RemoveCustomer(int pos)
+    public void RemoveCustomer(int posInCustomerList, int posinIsCustomerPresent)
     {
-        customerList.RemoveAt(pos);
-        for(int i=pos+1; i<customerList.Count; ++i)
+        customerList.RemoveAt(posInCustomerList);
+        isCustomerPresent[posinIsCustomerPresent] = -1;
+
+        for(int i=0; i<isCustomerPresent.Count; ++i)
         {
-            isCustomerPresent[i]--;
+            if(isCustomerPresent[i] > posInCustomerList && isCustomerPresent[i] != -1)
+            {
+                isCustomerPresent[i]--;
+            }
         }
-        isCustomerPresent[pos] = -1;
+
+        //PrintCustomer();
+    }
+
+    void PrintCustomer()
+    {
+        Debug.Log("---");
+        for (int i=0; i<customerList.Count; ++i)
+        {
+            Debug.Log(i);
+            foreach (SaladOrder sad in customerList[i].orderList)
+            {
+                Debug.Log(sad.name);
+            }
+        }
+
+        foreach (int num in isCustomerPresent)
+            Debug.Log(num);
+        Debug.Log("---");
     }
 }

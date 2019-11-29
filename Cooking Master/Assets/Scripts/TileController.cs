@@ -137,6 +137,10 @@ public class TileController : MonoBehaviour {
                         break;
                 }
             }
+            else
+            {
+                userGuide[p].text = "";
+            }
         }
     }
 
@@ -228,15 +232,15 @@ public class TileController : MonoBehaviour {
                                 }
                                 playerController.players[p].timeRemaining = val;
                                 Destroy(customerController.customerList[CustomerController.isCustomerPresent[col-1]].go);
-                                customerController.RemoveCustomer(CustomerController.isCustomerPresent[col - 1]);
-                                CustomerController.isCustomerPresent[col - 1] = -1;
+                                customerController.RemoveCustomer(CustomerController.isCustomerPresent[col - 1], col - 1);
+                                //CustomerController.isCustomerPresent[col - 1] = -1;
                                 Trash(p);
                                 break;
                             case CustomerSatisfaction.veryHappy:
                                 //TODO: Implement power ups
                                 break;
                         }
-                        Debug.Log("Present");
+
 
                         UpdateScores(p, playerController.players[p].score);
                     }
