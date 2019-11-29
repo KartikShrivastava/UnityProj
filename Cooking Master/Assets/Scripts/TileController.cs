@@ -10,7 +10,9 @@ public class TileController : MonoBehaviour {
     public CustomerController customerController;
     public GameObject[] fruits;
     public Text[] scoreText;
+    public Text[] userGuide;
 
+    private string[] ctrlFuncs = { "E", "/" };
     private List<List<Tile>> tiles;
     private int numRows, numColumns;
 
@@ -109,6 +111,32 @@ public class TileController : MonoBehaviour {
             tiles[row][col].go.GetComponent<MeshRenderer>().material = playerController.players[p].material;
             tiles[row][col].isOccupied = true;
             tiles[row][col].occupyingPlayer = p;
+
+            ItemsController obj = tiles[row][col].go.GetComponent<ItemsController>();
+            if (obj != null)
+            {
+                switch (obj.type)
+                {
+                    case ItemType.Fruit:
+                        userGuide[p].text = "Press " + ctrlFuncs[p] + " to pick fruit";
+                        break;
+                    case ItemType.Process:
+                        userGuide[p].text = "Press " + ctrlFuncs[p] + " to process fruit";
+                        break;
+                    case ItemType.PickOrder:
+                        userGuide[p].text = "Press " + ctrlFuncs[p] + " to pick order";
+                        break;
+                    case ItemType.Trash:
+                        userGuide[p].text = "Press " + ctrlFuncs[p] + " to trash the items";
+                        break;
+                    case ItemType.Serve:
+                        userGuide[p].text = "Press " + ctrlFuncs[p] + " serve the order";
+                        break;
+                    default:
+                        userGuide[p].text = "";
+                        break;
+                }
+            }
         }
     }
 
