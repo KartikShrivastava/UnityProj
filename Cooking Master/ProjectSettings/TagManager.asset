@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Movable
   - Vegetable
+  - CustomerTimer
   layers:
   - Default
   - TransparentFX

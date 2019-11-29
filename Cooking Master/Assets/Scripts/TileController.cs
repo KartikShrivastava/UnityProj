@@ -151,7 +151,6 @@ public class TileController : MonoBehaviour {
             switch (obj.type)
             {
                 case ItemType.Fruit:
-
                     if (playerController.players[p].items.Count < 2 && playerController.players[p].salad.Count <= 0)
                     {
                         GameObject go = Instantiate(fruits[(int)obj.fruit]);
@@ -179,6 +178,7 @@ public class TileController : MonoBehaviour {
                         go = null;
                     }
                     break;
+
                 case ItemType.Process:
                     if (playerController.players[p].items.Count > 0)
                     {
@@ -190,18 +190,20 @@ public class TileController : MonoBehaviour {
                         }
                     }
                     break;
+
                 case ItemType.PickOrder:
                     PickOrderController pickOrderController = tiles[row][col].go.GetComponent<PickOrderController>();
-
                     if (pickOrderController && pickOrderController.processedFruit.Count>0 && playerController.players[p].items.Count <= 0)
                     {
                         playerController.players[p].AddSalad(pickOrderController.processedFruit);
                         pickOrderController.Clear();
                     }
                     break;
+
                 case ItemType.Trash:
                     Trash(p);
                     break;
+
                 case ItemType.Serve:
                     ServiceController serviceController = tiles[row][col].go.GetComponent<ServiceController>();
                     Debug.Log(CustomerController.isCustomerPresent[col - 1]);
@@ -214,39 +216,33 @@ public class TileController : MonoBehaviour {
                         switch (customerSatisfaction)
                         {
                             case CustomerSatisfaction.angry:
-                                playerController.players[p].score -= 5;
+                                playerController.players[p].score += 5;
+                                Destroy(customerController.customerList[CustomerController.isCustomerPresent[col - 1]].go);
+                                customerController.RemoveCustomer(CustomerController.isCustomerPresent[col - 1], col - 1);
+                                Trash(p);
                                 break;
+
                             case CustomerSatisfaction.veryAngry:
                                 playerController.players[p].score -= 10;
                                 break;
+
                             case CustomerSatisfaction.happy:
                                 playerController.players[p].score += 20;
-                                float val = playerController.players[p].timeRemaining;
-                                if(val+2.0f > playerController.timerMaxVal)
-                                {
-                                    val = playerController.timerMaxVal;
-                                }
-                                else
-                                {
-                                    val = val + 2.0f;
-                                }
-                                playerController.players[p].timeRemaining = val;
+                                playerController.players[p].GiveBonusTime(2.0f, playerController.timerMaxVal);
                                 Destroy(customerController.customerList[CustomerController.isCustomerPresent[col-1]].go);
                                 customerController.RemoveCustomer(CustomerController.isCustomerPresent[col - 1], col - 1);
-                                //CustomerController.isCustomerPresent[col - 1] = -1;
                                 Trash(p);
                                 break;
+
                             case CustomerSatisfaction.veryHappy:
-                                //TODO: Implement power ups
+                                playerController.players[p].score += 25;
+                                playerController.players[p].GiveBonusTime(3.0f, playerController.timerMaxVal);
+                                Destroy(customerController.customerList[CustomerController.isCustomerPresent[col - 1]].go);
+                                customerController.RemoveCustomer(CustomerController.isCustomerPresent[col - 1], col - 1);
+                                Trash(p);
                                 break;
                         }
-
-
                         UpdateScores(p, playerController.players[p].score);
-                    }
-                    else
-                    {
-                        Debug.Log("Absent");
                     }
                     break;
             }

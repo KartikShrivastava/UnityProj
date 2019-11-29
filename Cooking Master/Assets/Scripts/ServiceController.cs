@@ -11,12 +11,10 @@ public class ServiceController : MonoBehaviour
 {
     public CustomerSatisfaction CheckCombination(Customer customer, List<GameObject> salad, int player)
     {
-
         //customer angry
         if(customer.orderList.Count != salad.Count)
         {
-            Debug.Log("Customer angry");
-            return CustomerSatisfaction.angry;
+            return CustomerSatisfaction.veryAngry;
         }
         
         for(int i=0; i<customer.orderList.Count; ++i)
@@ -24,14 +22,11 @@ public class ServiceController : MonoBehaviour
             //again customer angry
             if (salad[i].GetComponent<ItemsController>().fruit != customer.orderList[i].name)
             {
-                Debug.Log(salad[i].GetComponent<ItemsController>().fruit + " " + customer.orderList[i].name);
-                Debug.Log("Customer angry");
-                return CustomerSatisfaction.angry;
+                return CustomerSatisfaction.veryAngry;
             }
         }
 
-        //customer happy
-        Debug.Log("Customer happy");
-        return CustomerSatisfaction.happy;
+        //check at what time did customer get served
+        return customer.satisfactionState;
     }
 }

@@ -13,6 +13,7 @@ public class Player {
     public int score = 0;
 
     public Player(int r, int c, Material m, float t, GameObject timeBarGO, GameObject trayGO) {
+        score = 0;
         row = r;
         col = c;
         material = m;
@@ -67,6 +68,20 @@ public class Player {
             child.transform.SetParent(tray.transform);
             child.transform.position = new Vector3(child.transform.position.x, child.transform.position.y, 0.0f);
         }
+    }
+
+    public void GiveBonusTime(float add, float maxVal)
+    {
+        float temp = timeRemaining;
+        if (temp + add > maxVal)
+        {
+            temp = maxVal;
+        }
+        else
+        {
+            temp = temp + 2.0f;
+        }
+        timeRemaining = temp;
     }
 
     public void Clear()
